@@ -40,6 +40,18 @@ class Scraper:
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
 
+    def list_latest_tweets(self, list_ids: list[int], **kwargs) -> list[dict]:
+        """
+        Get latest tweets by a list id.
+
+        Metadata for list latest tweets in timeline.
+
+        @param list_ids: list of list ids
+        @param kwargs: optional keyword arguments
+        @return: list of list latest tweet data as dicts
+        """
+        return self._run(Operation.ListLatestTweetsTimeline, list_ids, **kwargs)
+
     def users(self, screen_names: list[str], **kwargs) -> list[dict]:
         """
         Get user data by screen names.

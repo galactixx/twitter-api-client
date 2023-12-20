@@ -131,6 +131,7 @@ class Operation:
     Favoriters = {'tweetId': int}, 'XRRjv1-uj1HZn3o324etOQ', 'Favoriters'
     ConnectTabTimeline = {'context': dict}, 'lq02A-gEzbLefqTgD_PFzQ', 'ConnectTabTimeline'
     ListLatestTweetsTimeline = {'listId': int}, '2TemLyqrMpTeAmysdbnVqw', 'ListLatestTweetsTimeline'
+    ListMembers = {'listId': int}, 'vA952kfgGw6hh8KatWnbqw', 'ListMembers'
 
     # Account Operations
     useSendMessageMutation = 'MaxK2PKX1F9Z-9SwqwavTw', 'useSendMessageMutation'
@@ -270,7 +271,6 @@ class Operation:
     ListBySlug = '3-E3eSWorCv24kYkK3CCiQ', 'ListBySlug'
     ListCreationRecommendedUsers = 'Zf8ZwG57EKtss-rPlryIqg', 'ListCreationRecommendedUsers'
     ListEditRecommendedUsers = '-F4wsOirYNXjjg-ZjccQpQ', 'ListEditRecommendedUsers'
-    ListMembers = 'vA952kfgGw6hh8KatWnbqw', 'ListMembers'
     ListMemberships = 'BlEXXdARdSeL_0KyKHHvvg', 'ListMemberships'
     ListOwnerships = 'wQcOSjSQ8NtgxIwvYl1lMg', 'ListOwnerships'
     ListPins = 'J0JOhmi8HSsle8LfSWv0cw', 'ListPins'

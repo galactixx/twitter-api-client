@@ -40,6 +40,18 @@ class Scraper:
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
 
+    def list_members(self, list_ids: list[int], **kwargs) -> list[dict]:
+        """
+        Get members by a list id.
+
+        Metadata for members in a given list.
+
+        @param list_ids: list of list ids
+        @param kwargs: optional keyword arguments
+        @return: list of members as dicts
+        """
+        return self._run(Operation.ListMembers, list_ids, **kwargs)
+
     def list_latest_tweets(self, list_ids: list[int], **kwargs) -> list[dict]:
         """
         Get latest tweets by a list id.

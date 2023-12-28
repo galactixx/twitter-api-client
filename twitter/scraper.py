@@ -40,7 +40,7 @@ class Scraper:
         self.logger = self._init_logger(**kwargs)
         self.session = self._validate_session(email, username, password, session, **kwargs)
 
-    def list_members(self, list_ids: list[int], **kwargs) -> list[dict]:
+    async def list_members(self, list_ids: list[int], **kwargs) -> list[dict]:
         """
         Get members by a list id.
 
@@ -50,9 +50,9 @@ class Scraper:
         @param kwargs: optional keyword arguments
         @return: list of members as dicts
         """
-        return self._run(Operation.ListMembers, list_ids, **kwargs)
+        return await self._run(Operation.ListMembers, list_ids, **kwargs)
 
-    def list_latest_tweets(self, list_ids: list[int], **kwargs) -> list[dict]:
+    async def list_latest_tweets(self, list_ids: list[int], **kwargs) -> list[dict]:
         """
         Get latest tweets by a list id.
 
@@ -62,9 +62,9 @@ class Scraper:
         @param kwargs: optional keyword arguments
         @return: list of list latest tweet data as dicts
         """
-        return self._run(Operation.ListLatestTweetsTimeline, list_ids, **kwargs)
+        return await self._run(Operation.ListLatestTweetsTimeline, list_ids, **kwargs)
 
-    def users(self, screen_names: list[str], **kwargs) -> list[dict]:
+    async def users(self, screen_names: list[str], **kwargs) -> list[dict]:
         """
         Get user data by screen names.
 
@@ -72,7 +72,7 @@ class Scraper:
         @param kwargs: optional keyword arguments
         @return: list of user data as dicts
         """
-        return self._run(Operation.UserByScreenName, screen_names, **kwargs)
+        return await self._run(Operation.UserByScreenName, screen_names, **kwargs)
 
     def tweets_by_id(self, tweet_ids: list[int | str], **kwargs) -> list[dict]:
         """
@@ -593,8 +593,9 @@ class Scraper:
 
         return asyncio.run(process())
 
-    def _run(self, operation: tuple[dict, str, str], queries: set | list[int | str | list | dict], **kwargs):
+    async def _run(self, operation: tuple[dict, str, str], queries: set | list[int | str | list | dict], **kwargs):
         keys, qid, name = operation
+
         # stay within rate-limits
         if (l := len(queries)) > MAX_ENDPOINT_LIMIT:
             if self.debug:
@@ -602,12 +603,12 @@ class Scraper:
             queries = list(queries)[:MAX_ENDPOINT_LIMIT]
 
         if all(isinstance(q, dict) for q in queries):
-            data = asyncio.run(self._process(operation, list(queries), **kwargs))
+            data = await self._process(operation, list(queries), **kwargs)
             return get_json(data, **kwargs)
 
         # queries are of type set | list[int|str], need to convert to list[dict]
         _queries = [{k: q} for q in queries for k, v in keys.items()]
-        res = asyncio.run(self._process(operation, _queries, **kwargs))
+        res = await self._process(operation, _queries, **kwargs)
         data = get_json(res, **kwargs)
         return data.pop() if kwargs.get('cursor') else flatten(data)
 
@@ -617,7 +618,7 @@ class Scraper:
             'variables': Operation.default_variables | keys | kwargs,
             'features': Operation.default_features,
         }
-        r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))
+        r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))        
         if self.debug:
             log(self.logger, self.debug, r)
         if self.save:
@@ -627,6 +628,8 @@ class Scraper:
     async def _process(self, operation: tuple, queries: list[dict], **kwargs):
         headers = self.session.headers if self.guest else get_headers(self.session)
         cookies = self.session.cookies
+        results = []
+
         async with AsyncClient(limits=Limits(max_connections=MAX_ENDPOINT_LIMIT), headers=headers, cookies=cookies, timeout=20) as c:
             tasks = (self._paginate(c, operation, **q, **kwargs) for q in queries)
             if self.pbar:

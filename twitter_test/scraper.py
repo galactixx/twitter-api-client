@@ -619,7 +619,11 @@ class Scraper:
             'variables': Operation.default_variables | keys | kwargs,
             'features': Operation.default_features,
         }
-        r = await client.get(f'https://twitter.com/i/api/graphql/{qid}/{name}', params=build_params(params))        
+        r = await client.get(
+            f'https://twitter.com/i/api/graphql/{qid}/{name}',
+            params=build_params(params)
+        )
+
         if self.debug:
             log(self.logger, self.debug, r)
         if self.save:
@@ -629,7 +633,6 @@ class Scraper:
     async def _process(self, operation: tuple, queries: list[dict], **kwargs):
         headers = self.session.headers if self.guest else get_headers(self.session)
         cookies = self.session.cookies
-        results = []
 
         async with AsyncClient(
             limits=Limits(max_connections=MAX_ENDPOINT_LIMIT),
@@ -658,7 +661,6 @@ class Scraper:
                 r = await self._query(client, operation, **kwargs)
                 initial_data = r.json()
                 res = [r]
-                # ids = get_ids(initial_data, operation) # todo
                 ids = {x for x in find_key(initial_data, 'rest_id') if x[0].isnumeric()}
 
                 cursor = get_cursor(initial_data)
@@ -678,7 +680,6 @@ class Scraper:
                     self.logger.error(f'Failed to get pagination data\n{e}')
                 return
             cursor = get_cursor(data)
-            # ids |= get_ids(data, operation) # todo
             ids |= {x for x in find_key(data, 'rest_id') if x[0].isnumeric()}
 
             if self.debug:

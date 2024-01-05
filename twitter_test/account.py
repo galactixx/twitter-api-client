@@ -37,6 +37,7 @@ class Account:
     def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, **kwargs):
         self.save = kwargs.get('save', True)
         self.debug = kwargs.get('debug', 0)
+        self.proxies = kwargs.get('proxies', {})
         self.gql_api = 'https://twitter.com/i/api/graphql'
         self.v1_api = 'https://api.twitter.com/1.1'
         self.v2_api = 'https://twitter.com/i/api/2'
@@ -54,10 +55,12 @@ class Account:
             data = {'json': params}
         else:
             data = {'params': {k: orjson.dumps(v).decode() for k, v in params.items()}}
+            
         r = self.session.request(
             method=method,
             url=f'{self.gql_api}/{qid}/{op}',
             headers=get_headers(self.session),
+            proxies=self.proxies,
             **data
         )
         if self.debug:

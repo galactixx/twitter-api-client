@@ -8,7 +8,7 @@ import aiofiles
 import orjson
 from httpx import AsyncClient, Client
 
-from twitter.constants import *
+from twitter_test.constants import *
 
 try:
     import nest_asyncio

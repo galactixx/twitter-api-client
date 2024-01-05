@@ -147,6 +147,7 @@ def execute_login_flow(client: Client, **kwargs) -> Client | None:
 
 
 def login(email: str, username: str, password: str, **kwargs) -> Client:
+    proxies = kwargs.get('proxies', {})
     client = Client(
         cookies={
             "email": email,
@@ -162,7 +163,8 @@ def login(email: str, username: str, password: str, **kwargs) -> Client:
             'x-twitter-active-user': 'yes',
             'x-twitter-client-language': 'en',
         },
-        follow_redirects=True
+        follow_redirects=True,
+        proxies=proxies
     )
     client = execute_login_flow(client, **kwargs)
     if not client or client.cookies.get('flow_errors') == 'true':

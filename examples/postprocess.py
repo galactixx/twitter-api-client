@@ -1,6 +1,6 @@
 import re
 import pandas as pd
-from twitter_test.util import find_key
+from twitter.util import find_key
 
 
 def get_tweets(data: list | dict, cols: list[str] = None):

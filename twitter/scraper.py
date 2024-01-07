@@ -1,7 +1,6 @@
 import asyncio
 import logging.config
 import math
-import platform
 from functools import partial
 from typing import Generator
 
@@ -12,23 +11,6 @@ from tqdm.asyncio import tqdm_asyncio
 from .constants import *
 from .login import login
 from .util import *
-
-try:
-    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
-        import nest_asyncio
-
-        nest_asyncio.apply()
-except:
-    ...
-
-if platform.system() != 'Windows':
-    try:
-        import uvloop
-
-        uvloop.install()
-    except ImportError as e:
-        ...
-
 
 class Scraper:
     def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, **kwargs):
@@ -634,6 +616,7 @@ class Scraper:
         headers = self.session.headers if self.guest else get_headers(self.session)
         cookies = self.session.cookies
 
+        print(self.proxies)
         async with AsyncClient(
             limits=Limits(max_connections=MAX_ENDPOINT_LIMIT),
             headers=headers,
@@ -647,6 +630,7 @@ class Scraper:
             return await asyncio.gather(*tasks)
 
     async def _paginate(self, client: AsyncClient, operation: tuple, **kwargs):
+        print(client.proxies)
         limit = kwargs.pop('limit', math.inf)
         cursor = kwargs.pop('cursor', None)
         is_resuming = False

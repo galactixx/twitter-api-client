@@ -10,18 +10,6 @@ from httpx import AsyncClient, Client
 
 from twitter.constants import *
 
-try:
-    import nest_asyncio
-    nest_asyncio.apply()
-except:
-    ...
-
-try:
-    import uvloop
-    uvloop.install()
-except:
-    ...
-
 STRINGS = Path('strings.txt')
 PATHS = Path('paths.txt')
 JS_FILES_MAP = Path('js.json')

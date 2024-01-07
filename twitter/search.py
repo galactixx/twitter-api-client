@@ -1,7 +1,6 @@
 import asyncio
 import logging.config
 import math
-import platform
 import random
 import re
 import time
@@ -17,21 +16,6 @@ from .util import get_headers, find_key, build_params
 
 reset = '\x1b[0m'
 colors = [f'\x1b[{i}m' for i in range(31, 37)]
-
-try:
-    if get_ipython().__class__.__name__ == 'ZMQInteractiveShell':
-        import nest_asyncio
-        nest_asyncio.apply()
-except:
-    ...
-
-if platform.system() != 'Windows':
-    try:
-        import uvloop
-        uvloop.install()
-    except ImportError as e:
-        ...
-
 
 class Search:
     def __init__(self, email: str = None, username: str = None, password: str = None, session: Client = None, **kwargs):

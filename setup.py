@@ -4,13 +4,11 @@ from pathlib import Path
 
 install_requires = [
     'aiofiles',
-    'nest_asyncio',
     'httpx',
     'tqdm',
     'orjson',
     'm3u8',
-    'websockets',
-    'uvloop; platform_system != "Windows"',
+    'websockets'
 ]
 
 about = {}

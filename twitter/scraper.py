@@ -615,8 +615,7 @@ class Scraper:
     async def _process(self, operation: tuple, queries: list[dict], **kwargs):
         headers = self.session.headers if self.guest else get_headers(self.session)
         cookies = self.session.cookies
-
-        print(self.proxies)
+        
         async with AsyncClient(
             limits=Limits(max_connections=MAX_ENDPOINT_LIMIT),
             headers=headers,
@@ -630,7 +629,6 @@ class Scraper:
             return await asyncio.gather(*tasks)
 
     async def _paginate(self, client: AsyncClient, operation: tuple, **kwargs):
-        print(client.proxies)
         limit = kwargs.pop('limit', math.inf)
         cursor = kwargs.pop('cursor', None)
         is_resuming = False

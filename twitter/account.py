@@ -44,7 +44,6 @@ class Account:
             method=method,
             url=f'{self.gql_api}/{qid}/{op}',
             headers=get_headers(self.session),
-            proxies=self.proxies,
             **data
         )
         if self.debug:
@@ -599,8 +598,7 @@ class Account:
 
             return logging.getLogger(logger_name)
 
-    @staticmethod
-    def _validate_session(*args, **kwargs):
+    def _validate_session(self, *args, **kwargs):
         email, username, password, session = args
 
         # validate credentials
@@ -619,14 +617,22 @@ class Account:
 
         # try validating cookies dict
         if isinstance(cookies, dict) and all(cookies.get(c) for c in {'ct0', 'auth_token'}):
-            _session = Client(cookies=cookies, follow_redirects=True)
+            _session = Client(
+                cookies=cookies,
+                follow_redirects=True,
+                proxies=self.proxies
+            )
             _session._init_with_cookies = True
             _session.headers.update(get_headers(_session))
             return _session
 
         # try validating cookies from file
         if isinstance(cookies, str):
-            _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True)
+            _session = Client(
+                cookies=orjson.loads(Path(cookies).read_bytes()),
+                follow_redirects=True,
+                proxies=self.proxies
+            )
             _session._init_with_cookies = True
             _session.headers.update(get_headers(_session))
             return _session

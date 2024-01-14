@@ -81,6 +81,10 @@ class Account:
         variables = {"source_tweet_id": tweet_id, "dark_request": False}
         return await self.gql('POST', Operation.DeleteRetweet, variables)
 
+    async def untweet(self, tweet_id: int) -> dict:
+        variables = {'tweet_id': tweet_id, 'dark_request': False}
+        return await self.gql('POST', Operation.DeleteTweet, variables)
+
     async def like(self, tweet_id: int) -> dict:
         variables = {'tweet_id': tweet_id}
         return await self.gql('POST', Operation.FavoriteTweet, variables)

@@ -260,6 +260,19 @@ class Account:
 
     async def bookmarks(self, limit=math.inf) -> list[dict]:
         return await self._paginate('GET', Operation.Bookmarks, {}, limit)
+    
+    async def tweet(self, text: str) -> dict:
+        variables = {
+            'tweet_text': text,
+            'dark_request': False,
+            'media': {
+                'media_entities': [],
+                'possibly_sensitive': False,
+            },
+            'semantic_annotation_ids': [],
+        }
+
+        return await self.gql('POST', Operation.CreateTweet, variables)
 
     async def _paginate(
         self, 

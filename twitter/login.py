@@ -16,7 +16,7 @@ async def update_token(client: AsyncClient, key: str, url: str, **kwargs) -> Asy
         }
         client.headers.update(headers)
         r = await client.post(url, **kwargs)
-        info = await r.json()
+        info = r.json()
 
         for task in info.get('subtasks', []):
             if task.get('enter_text', {}).get('keyboard_type') == 'email':

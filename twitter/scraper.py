@@ -10,10 +10,20 @@ from .login import login
 from .util import *
 
 class Scraper:
-    def __init__(
+    def __init__(self):
+        self.save = True
+        self.debug = 0
+        self.pbar = True
+        self.proxies = {}
+        self.out = Path('data')
+        self.guest = False
+        self.logger: Logger = None
+        self.session: AsyncClient = None
+        
+    async def init_session(
         self,
         email: str = None,
-        username: str = None,
+        username: str = None, 
         password: str = None,
         session: Client = None,
         **kwargs
@@ -23,15 +33,14 @@ class Scraper:
         self.pbar = kwargs.get('pbar', True)
         self.proxies = kwargs.get('proxies', {})
         self.out = Path(kwargs.get('out', 'data'))
-        self.guest = False
-        self.logger = self._init_logger(**kwargs)
-        self.session = self._validate_session(
+        self.session = await self._validate_session(
             email, 
             username, 
             password, 
             session,
             **kwargs
         )
+        self.logger = self._init_logger(**kwargs)
 
     async def list_members(self, list_ids: list[int], **kwargs) -> list[dict]:
         """
@@ -408,12 +417,12 @@ class Scraper:
 
             return logging.getLogger(logger_name)
 
-    def _validate_session(self, *args, **kwargs):
+    async def _validate_session(self, *args, **kwargs):
         email, username, password, session = args
 
         # validate credentials
         if all((email, username, password)):
-            return login(email, username, password, **kwargs)
+            return await login(email, username, password, **kwargs)
 
         # invalid credentials, try validating session
         if session and all(session.cookies.get(c) for c in {'ct0', 'auth_token'}):
@@ -424,13 +433,16 @@ class Scraper:
 
         # try validating cookies dict
         if isinstance(cookies, dict) and all(cookies.get(c) for c in {'ct0', 'auth_token'}):
-            _session = Client(cookies=cookies, follow_redirects=True)
+            _session = AsyncClient(cookies=cookies, follow_redirects=True)
             _session.headers.update(get_headers(_session))
             return _session
 
         # try validating cookies from file
         if isinstance(cookies, str):
-            _session = Client(cookies=orjson.loads(Path(cookies).read_bytes()), follow_redirects=True)
+            _session = AsyncClient(
+                cookies=orjson.loads(Path(cookies).read_bytes()),
+                follow_redirects=True
+            )
             _session.headers.update(get_headers(_session))
             return _session
 

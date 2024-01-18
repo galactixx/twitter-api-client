@@ -8,7 +8,7 @@ from urllib.parse import urlsplit, urlencode, urlunsplit, parse_qs, quote
 import aiofiles
 import orjson
 from aiofiles.os import makedirs
-from httpx import Response, Client
+from httpx import Response, Client, AsyncClient
 
 from .constants import GREEN, MAGENTA, RED, RESET, ID_MAP, MAX_GQL_CHAR_LIMIT, USER_AGENTS
 
@@ -110,7 +110,7 @@ def get_cursor(data: list | dict) -> str:
                 return content['value']  # v1 cursor
 
 
-def get_headers(session, **kwargs) -> dict:
+def get_headers(session: AsyncClient, **kwargs) -> dict:
     """
     Get the headers required for authenticated requests
     """

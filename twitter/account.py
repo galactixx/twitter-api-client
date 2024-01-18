@@ -10,7 +10,17 @@ from .util import *
 
 class Account:
 
-    def __init__(
+    def __init__(self):
+        self.gql_api = 'https://twitter.com/i/api/graphql'
+        self.v1_api = 'https://api.twitter.com/1.1'
+        self.v2_api = 'https://twitter.com/i/api/2'
+        self.logger: Logger = None
+        self.session: AsyncClient = None
+        self.save = True
+        self.debug = 0
+        self.proxies = {}
+
+    async def init_session(
         self,
         email: str = None,
         username: str = None, 
@@ -21,17 +31,14 @@ class Account:
         self.save = kwargs.get('save', True)
         self.debug = kwargs.get('debug', 0)
         self.proxies = kwargs.get('proxies', {})
-        self.gql_api = 'https://twitter.com/i/api/graphql'
-        self.v1_api = 'https://api.twitter.com/1.1'
-        self.v2_api = 'https://twitter.com/i/api/2'
-        self.logger = self._init_logger(**kwargs)
-        self.session = self._validate_session(
+        self.session = await self._validate_session(
             email, 
             username, 
             password, 
             session, 
             **kwargs
         )
+        self.logger = self._init_logger(**kwargs)
 
     async def gql(
         self,
@@ -333,12 +340,12 @@ class Account:
 
             return logging.getLogger(logger_name)
 
-    def _validate_session(self, *args, **kwargs):
+    async def _validate_session(self, *args, **kwargs):
         email, username, password, session = args
 
         # validate credentials
         if all((email, username, password)):
-            session = login(email, username, password, **kwargs)
+            session = await login(email, username, password, **kwargs)
             session._init_with_cookies = False
             return session
 

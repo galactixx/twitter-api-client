@@ -194,8 +194,13 @@ async def execute_login_flow(client: AsyncClient, **kwargs) -> AsyncClient | Non
     return client
 
 
-async def login(email: str, username: str, password: str, **kwargs) -> AsyncClient:
-    proxies = kwargs.get('proxies', {})
+async def login(
+    email: str,
+    username: str,
+    password: str,
+    proxies: dict,
+    **kwargs
+) -> AsyncClient:
     client = AsyncClient(
         cookies={
             "email": email,

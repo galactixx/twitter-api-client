@@ -10,11 +10,11 @@ from .login import login
 from .util import *
 
 class Scraper:
-    def __init__(self):
-        self.save = True
+    def __init__(self, proxies: dict = {}):
+        self.proxies = proxies
+        self.save = False
         self.debug = 0
         self.pbar = True
-        self.proxies = {}
         self.out = Path('data')
         self.guest = False
         self.logger: Logger = None
@@ -28,19 +28,14 @@ class Scraper:
         session: Client = None,
         **kwargs
     ):
-        self.save = kwargs.get('save', True)
-        self.debug = kwargs.get('debug', 0)
-        self.pbar = kwargs.get('pbar', True)
-        self.proxies = kwargs.get('proxies', {})
-        self.out = Path(kwargs.get('out', 'data'))
+        self.logger = self._init_logger(**kwargs)
         self.session = await self._validate_session(
             email, 
             username, 
-            password, 
+            password,
             session,
             **kwargs
         )
-        self.logger = self._init_logger(**kwargs)
 
     async def list_members(self, list_ids: list[int], **kwargs) -> list[dict]:
         """
@@ -422,7 +417,13 @@ class Scraper:
 
         # validate credentials
         if all((email, username, password)):
-            return await login(email, username, password, **kwargs)
+            return await login(
+                email=email,
+                username=username,
+                password=password,
+                proxies=self.proxies,
+                **kwargs
+            )
 
         # invalid credentials, try validating session
         if session and all(session.cookies.get(c) for c in {'ct0', 'auth_token'}):

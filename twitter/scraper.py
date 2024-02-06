@@ -69,7 +69,29 @@ class Scraper:
             **kwargs
         )
 
-    async def users(self, screen_names: list[str], **kwargs) -> list[dict]:
+    async def user_by_screen_name(
+        self, 
+        screen_name: str,
+        **kwargs
+    ) -> list[dict]:
+        """
+        Get user data by a screen name.
+
+        @param screen_name: string screen name (username)
+        @param kwargs: optional keyword arguments
+        @return: list of user data as dicts
+        """
+        return await self._run(
+            Operation.UserByScreenName,
+            screen_name,
+            **kwargs
+        )
+
+    async def users_by_screen_names(
+        self,
+        screen_names: list[str],
+        **kwargs
+    ) -> list[dict]:
         """
         Get user data by screen names.
 
